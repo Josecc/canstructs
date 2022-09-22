@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "npx lerna run build",
-    "publish": "lerna publish --no-private --verify-access --force-publish",
+    "publish": "lerna publish --verify-access --force-publish",
     "version": "lerna version"
   },
   "targetDefaults": {
