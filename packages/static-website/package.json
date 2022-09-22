@@ -1,6 +1,6 @@
 {
   "name": "@canstructs/static-website",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Static website construct with basic auth!",
   "author": "Jose Canahui <6405150+Josecc@users.noreply.github.com>",
   "license": "MIT",
