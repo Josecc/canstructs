@@ -9,8 +9,8 @@
     "nx": "^14.7.8"
   },
   "scripts": {
-    "publish": "lerna publish --no-private",
     "build": "npx lerna run build",
+    "publish": "lerna publish from-git --no-private --verify-access --force-publish",
     "version": "lerna version --no-private"
   },
   "targetDefaults": {
