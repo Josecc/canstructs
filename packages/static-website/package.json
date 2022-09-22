@@ -1,6 +1,22 @@
 {
-  "name": "static-website",
+  "name": "@canstructs/static-website",
   "version": "0.1.0",
+  "description": "Static website construct",
+  "author": "Jose Canahui <6405150+Josecc@users.noreply.github.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Josecc/canstructs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Josecc/canstructs/issues"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib"
+  ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {

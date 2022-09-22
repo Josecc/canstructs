@@ -5,10 +5,13 @@
     "packages/*"
   ],
   "devDependencies": {
-    "lerna": "^5.5.1"
+    "lerna": "^5.5.1",
+    "nx": "^14.7.8"
   },
   "scripts": {
-    "build": "npx lerna run build"
+    "publish": "lerna publish --no-private",
+    "build": "npx lerna run build",
+    "version": "lerna version --no-private"
   },
   "targetDefaults": {
     "build": {
