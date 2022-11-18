@@ -10,6 +10,8 @@ import { BucketDeployment, ISource } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from "constructs";
 
 export type StaticWebsiteProps = {
+  // TODO: clarify these names. url = domain name for website, where domainName is just
+  // the name of the hosted zone in the account...
   url: string,
   domainName: string,
   frontendSources: ISource[],
