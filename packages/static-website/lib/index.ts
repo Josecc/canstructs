@@ -17,7 +17,6 @@ export type StaticWebsiteProps = {
     username: string,
     password: string
   }
-  // if not provided, this will try to generate a DNS-validated certificate
   certificateARN?: string
 }
 
@@ -78,9 +77,7 @@ exports.handler = async (event, context, callback) => {
       ? Certificate.fromCertificateArn(this, 'WebsiteCertificate', props.certificateARN)
       : new DnsValidatedCertificate(this, 'WebsiteCertificate', {
           domainName: props.domainName,
-          hostedZone: PublicHostedZone.fromLookup(this, "StaticWebsiteHostedZone", {
-            domainName: props.domainName
-          })
+          hostedZone: zone
         })
 
     const cloudfrontToS3 = new CloudFrontToS3(this, 'S3BackedCloudfront', {
