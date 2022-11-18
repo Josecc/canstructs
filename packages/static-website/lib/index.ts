@@ -76,8 +76,8 @@ exports.handler = async (event, context, callback) => {
     const certificate = props.certificateARN
       ? Certificate.fromCertificateArn(this, 'WebsiteCertificate', props.certificateARN)
       : new DnsValidatedCertificate(this, 'WebsiteCertificate', {
-          domainName: props.domainName,
-          hostedZone: zone
+          domainName: props.url,
+          hostedZone: zone,
         })
 
     const cloudfrontToS3 = new CloudFrontToS3(this, 'S3BackedCloudfront', {
