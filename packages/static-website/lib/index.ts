@@ -1,16 +1,15 @@
 import { CloudFrontToS3 } from "@aws-solutions-constructs/aws-cloudfront-s3";
 import { CfnOutput, Duration } from "aws-cdk-lib";
-import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
+import { Certificate, DnsValidatedCertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { experimental, LambdaEdgeEventType } from "aws-cdk-lib/aws-cloudfront";
 import { Runtime, Code } from "aws-cdk-lib/aws-lambda";
-import { HostedZone, ARecord, RecordTarget } from "aws-cdk-lib/aws-route53";
+import { HostedZone, ARecord, RecordTarget, PublicHostedZone } from "aws-cdk-lib/aws-route53";
 import { CloudFrontTarget } from "aws-cdk-lib/aws-route53-targets";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { BucketDeployment, ISource } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from "constructs";
 
 export type StaticWebsiteProps = {
-  certificateARN: string,
   url: string,
   domainName: string,
   frontendSources: ISource[],
@@ -18,6 +17,8 @@ export type StaticWebsiteProps = {
     username: string,
     password: string
   }
+  // if not provided, this will try to generate a DNS-validated certificate
+  certificateARN?: string
 }
 
 export class StaticWebsite extends Construct {
@@ -73,6 +74,15 @@ exports.handler = async (event, context, callback) => {
       }
     ] : undefined
 
+    const certificate = props.certificateARN
+      ? Certificate.fromCertificateArn(this, 'WebsiteCertificate', props.certificateARN)
+      : new DnsValidatedCertificate(this, 'WebsiteCertificate', {
+          domainName: props.domainName,
+          hostedZone: PublicHostedZone.fromLookup(this, "StaticWebsiteHostedZone", {
+            domainName: props.domainName
+          })
+        })
+
     const cloudfrontToS3 = new CloudFrontToS3(this, 'S3BackedCloudfront', {
       logS3AccessLogs: false,
       existingBucketObj: websiteBucket,
@@ -80,7 +90,7 @@ exports.handler = async (event, context, callback) => {
       cloudFrontDistributionProps: {
         comment: `Cloudfront distribution for the static website`,
         domainNames: [props.url],
-        certificate: Certificate.fromCertificateArn(this, 'WebsiteCertificate', props.certificateARN),
+        certificate,
         errorResponses: [
           {
             ttl: Duration.minutes(5),
