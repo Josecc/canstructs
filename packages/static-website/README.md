@@ -1,9 +1,6 @@
-# Welcome to your CDK TypeScript Construct Library project
+# Static Website Construct
 
-You should explore the contents of this project. It demonstrates a CDK Construct Library that includes a construct (`StaticWebsite`)
-which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
-
-The construct defines an interface (`StaticWebsiteProps`) to configure the visibility timeout of the queue.
+This construct can deploy a website from static assets to a cloudfront distribution.
 
 ## Useful commands
 
