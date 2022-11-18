@@ -2,6 +2,10 @@
 
 This construct can deploy a website from static assets to a cloudfront distribution.
 
+## Usage
+
+this is readme for usage...
+
 ## Useful commands
 
 * `npm run build`   compile typescript to js
