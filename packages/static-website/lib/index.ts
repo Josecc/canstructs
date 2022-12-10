@@ -19,7 +19,7 @@ export type StaticWebsiteProps = {
     username: string,
     password: string
   }
-  edgeLambdas: EdgeLambda[]
+  edgeLambdas?: EdgeLambda[]
   certificateARN?: string
 }
 
@@ -76,7 +76,7 @@ exports.handler = async (event, context, callback) => {
         }
       : undefined
 
-    const edgeLambdas = [...props.edgeLambdas, basicAutEdgeLambda].filter(Boolean) 
+    const edgeLambdas = [...props.edgeLambdas ?? [], basicAutEdgeLambda].filter(Boolean) 
 
     const certificate = props.certificateARN
       ? Certificate.fromCertificateArn(this, 'WebsiteCertificate', props.certificateARN)
