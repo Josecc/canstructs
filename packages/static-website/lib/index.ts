@@ -1,7 +1,7 @@
 import { CloudFrontToS3 } from "@aws-solutions-constructs/aws-cloudfront-s3";
 import { CfnOutput, Duration } from "aws-cdk-lib";
 import { Certificate, DnsValidatedCertificate } from "aws-cdk-lib/aws-certificatemanager";
-import { EdgeLambda, experimental, LambdaEdgeEventType } from "aws-cdk-lib/aws-cloudfront";
+import { DistributionProps, EdgeLambda, experimental, LambdaEdgeEventType } from "aws-cdk-lib/aws-cloudfront";
 import { Runtime, Code } from "aws-cdk-lib/aws-lambda";
 import { HostedZone, ARecord, RecordTarget, PublicHostedZone } from "aws-cdk-lib/aws-route53";
 import { CloudFrontTarget } from "aws-cdk-lib/aws-route53-targets";
@@ -15,11 +15,11 @@ export type StaticWebsiteProps = {
   url: string,
   domainName: string,
   frontendSources: ISource[],
+  cloudfrontProps?: Partial<Omit<DistributionProps, "domainName" | "certificate">>
   basicAuth?: {
     username: string,
     password: string
   }
-  edgeLambdas?: EdgeLambda[]
   certificateARN?: string
 }
 
@@ -76,7 +76,7 @@ exports.handler = async (event, context, callback) => {
         }
       : undefined
 
-    const edgeLambdas = [...props.edgeLambdas ?? [], basicAutEdgeLambda].filter(Boolean) 
+    const edgeLambdas = [...props.cloudfrontProps?.defaultBehavior?.edgeLambdas ?? [], basicAutEdgeLambda].filter(Boolean) 
 
     const certificate = props.certificateARN
       ? Certificate.fromCertificateArn(this, 'WebsiteCertificate', props.certificateARN)
@@ -91,17 +91,11 @@ exports.handler = async (event, context, callback) => {
       insertHttpSecurityHeaders: false,
       cloudFrontDistributionProps: {
         comment: `Cloudfront distribution for the static website`,
+        ...props.cloudfrontProps,
         domainNames: [props.url],
         certificate,
-        errorResponses: [
-          {
-            ttl: Duration.minutes(5),
-            httpStatus: 403,
-            responseHttpStatus: 200,
-            responsePagePath: '/index.html',
-          }
-        ],
         defaultBehavior: {
+          ...props.cloudfrontProps?.defaultBehavior,
           edgeLambdas: edgeLambdas.length > 0 ? edgeLambdas : undefined,
         }
       }
