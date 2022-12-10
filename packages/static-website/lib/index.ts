@@ -15,7 +15,7 @@ export type StaticWebsiteProps = {
   url: string,
   domainName: string,
   frontendSources: ISource[],
-  cloudfrontProps?: Partial<Omit<DistributionProps, "domainName" | "certificate">>
+  cloudfrontProps?: Partial<Omit<DistributionProps, "domainNames" | "certificate">>
   basicAuth?: {
     username: string,
     password: string
