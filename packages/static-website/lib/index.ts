@@ -1,7 +1,7 @@
 import { CloudFrontToS3 } from "@aws-solutions-constructs/aws-cloudfront-s3";
 import { CfnOutput, Duration } from "aws-cdk-lib";
 import { Certificate, DnsValidatedCertificate } from "aws-cdk-lib/aws-certificatemanager";
-import { experimental, LambdaEdgeEventType } from "aws-cdk-lib/aws-cloudfront";
+import { EdgeLambda, experimental, LambdaEdgeEventType } from "aws-cdk-lib/aws-cloudfront";
 import { Runtime, Code } from "aws-cdk-lib/aws-lambda";
 import { HostedZone, ARecord, RecordTarget, PublicHostedZone } from "aws-cdk-lib/aws-route53";
 import { CloudFrontTarget } from "aws-cdk-lib/aws-route53-targets";
@@ -19,6 +19,7 @@ export type StaticWebsiteProps = {
     username: string,
     password: string
   }
+  edgeLambdas: EdgeLambda[]
   certificateARN?: string
 }
 
@@ -67,13 +68,15 @@ exports.handler = async (event, context, callback) => {
 
     const websiteBucket = new Bucket(this, 'WebsiteBucket')
 
-    const edgeLambdas = basicAuthLambda
-      ? [
-      {
-        functionVersion: basicAuthLambda.currentVersion,
-        eventType: LambdaEdgeEventType.VIEWER_REQUEST,
-      }
-    ] : undefined
+    const basicAutEdgeLambda = basicAuthLambda
+      ? 
+        {
+          functionVersion: basicAuthLambda.currentVersion,
+          eventType: LambdaEdgeEventType.VIEWER_REQUEST,
+        }
+      : undefined
+
+    const edgeLambdas = [...props.edgeLambdas, basicAutEdgeLambda].filter(Boolean) 
 
     const certificate = props.certificateARN
       ? Certificate.fromCertificateArn(this, 'WebsiteCertificate', props.certificateARN)
@@ -99,7 +102,7 @@ exports.handler = async (event, context, callback) => {
           }
         ],
         defaultBehavior: {
-          edgeLambdas,
+          edgeLambdas: edgeLambdas.length > 0 ? edgeLambdas : undefined,
         }
       }
     });
